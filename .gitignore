@@ -1,0 +1,17 @@
+node_modules/
+runtime39/
+runtime-download/
+dist/
+build/
+screenshots/
+.npm-cache/
+.electron-cache/
+.chrome-profile*/
+.user-data/
+.smoke-data/
+smoke/
+electron-debug.log
+electron.log
+electron-run.log
+electron-version.*
+*.log

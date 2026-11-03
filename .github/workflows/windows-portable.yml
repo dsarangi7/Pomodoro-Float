@@ -1,0 +1,77 @@
+name: Windows portable
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  portable:
+    name: Build Windows zip
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Cache Electron runtime zip
+        id: electron-runtime
+        uses: actions/cache@v4
+        with:
+          path: runtime-download
+          key: electron-win32-x64-39.8.10-${{ hashFiles('package-lock.json', 'scripts/fetch-electron.mjs', 'scripts/build-portable.mjs') }}
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          if ('${{ steps.electron-runtime.outputs.cache-hit }}' -eq 'true') {
+            # npm run build extracts scripts/fetch-electron.mjs output from
+            # runtime-download. Skip the separate electron package download
+            # once that zip is already cached.
+            $env:ELECTRON_SKIP_BINARY_DOWNLOAD = '1'
+          }
+          npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Build portable zip
+        run: npm run build
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pomodoro-Float-win64
+          path: dist/Pomodoro-Float-*-win64.zip
+          if-no-files-found: error
+
+      - name: Attach zip to the GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          shopt -s nullglob
+          zips=(dist/Pomodoro-Float-*-win64.zip)
+          if [ "${#zips[@]}" -ne 1 ]; then
+            echo "Expected one portable zip, found ${#zips[@]}"
+            ls -la dist || true
+            exit 1
+          fi
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" \
+              --title "Pomodoro Float ${tag}" \
+              --notes "Windows portable build attached by GitHub Actions."
+          fi
+          gh release upload "$tag" "${zips[0]}" --clobber

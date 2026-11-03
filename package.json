@@ -1,0 +1,23 @@
+{
+  "name": "pomodoro-float",
+  "productName": "Pomodoro Float",
+  "version": "1.2.1",
+  "description": "A calm, always-on-top Pomodoro timer for Windows.",
+  "main": "main.js",
+  "author": "Pomodoro Float",
+  "license": "MIT",
+  "scripts": {
+    "start": "node scripts/start.mjs",
+    "start:electron": "electron .",
+    "test": "node tests/timer-core.test.js && node tests/tasks.test.js && node tests/win-launch.test.js && node tests/ui.test.js && node tests/build-meta.test.js",
+    "fetch:runtime": "node scripts/fetch-electron.mjs 39.8.10",
+    "build": "node scripts/build-portable.mjs"
+  },
+  "devDependencies": {
+    "@electron/asar": "3.2.18",
+    "7zip-bin": "5.2.0",
+    "electron": "39.8.10",
+    "jsdom": "26.1.0",
+    "rcedit": "5.0.2"
+  }
+}
