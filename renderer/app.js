@@ -23,7 +23,9 @@
     hide: () => {},
     notify: () => {},
     updateTimer: () => {},
-    getInfo: async () => ({ version: "1.2.2" }),
+    getInfo: async () => ({ version: "1.3.0" }),
+    checkForUpdates: async () => ({ state: "current", message: "You're up to date.", notes: "", url: "" }),
+    openUpdate: async () => false,
     setTasksOpen: async (value) => Boolean(value),
     setHistoryOpen: async (value) => Boolean(value),
     copyText: async () => true,
@@ -86,6 +88,8 @@
     "historyDayLabel",
     "historyDayCount",
     "historyCopy",
+    "updateStatus",
+    "updateAction",
     "historyEmpty",
     "historyList",
     "historyClose",
@@ -990,6 +994,47 @@
     showToast("Stats cleared for a fresh start", 2200);
   }
 
+  let updateCheckToken = 0;
+
+  function showUpdateResult(result, { quiet }) {
+    const update = result?.state === "update";
+    if (quiet && !update) return;
+    if (!el.updateStatus || !el.updateAction) return;
+    const message = result?.message || "Couldn't check for updates.";
+    el.updateStatus.hidden = false;
+    el.updateStatus.textContent = update && result.notes ? `${message} ${result.notes}` : message;
+    el.updateAction.hidden = !update;
+    if (quiet && update) showToast(message, 4200);
+  }
+
+  async function checkForUpdates({ quiet = false } = {}) {
+    if (typeof bridge.checkForUpdates !== "function") return;
+    const token = ++updateCheckToken;
+    if (!quiet && el.updateStatus && el.updateAction) {
+      el.updateStatus.hidden = false;
+      el.updateStatus.textContent = "Checking…";
+      el.updateAction.hidden = true;
+    }
+    let result;
+    try {
+      result = await bridge.checkForUpdates();
+    } catch {
+      result = { state: "offline", message: "Couldn't reach GitHub. Try again." };
+    }
+    if (token !== updateCheckToken) return;
+    showUpdateResult(result, { quiet });
+  }
+
+  async function openUpdateDownload() {
+    if (typeof bridge.openUpdate !== "function") return;
+    try {
+      const opened = await bridge.openUpdate();
+      if (!opened) showToast("Couldn't open the download page", 2400);
+    } catch {
+      showToast("Couldn't open the download page", 2400);
+    }
+  }
+
   function handleAction(action, source) {
     switch (action) {
       case "toggle":
@@ -1041,6 +1086,12 @@
         break;
       case "copy-day":
         copyHistoryDay();
+        break;
+      case "check-updates":
+        checkForUpdates({ quiet: false });
+        break;
+      case "open-update":
+        openUpdateDownload();
         break;
       case "remove-task":
         removeTask(source?.dataset.taskId);
@@ -1243,6 +1294,8 @@
     } catch {
       /* Keep the bundled version label. */
     }
+
+    checkForUpdates({ quiet: true });
 
     if (running) startTicker();
     syncTray(true);

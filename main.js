@@ -4,6 +4,7 @@ const { app, BrowserWindow, Menu, Notification, Tray, clipboard, globalShortcut,
 const fs = require("node:fs");
 const path = require("node:path");
 const winLaunch = require("./win-launch");
+const updates = require("./update-check");
 
 // A parent folder with spaces makes Chromium exit 0x80000003 before the
 // window exists. Leave that path before any window or GPU startup.
@@ -15,6 +16,7 @@ if (process.env[winLaunch.SPACE_MAP_ENV]) {
 
 const APP_ID = "com.pomodorofloat.app";
 const FEEDBACK_MAIL = "dsarangi7@gmail.com";
+let lastUpdateUrl = "";
 
 function feedbackMailUrl(url) {
   if (typeof url !== "string" || !url.toLowerCase().startsWith("mailto:")) return "";
@@ -489,6 +491,47 @@ function wireIpc() {
       show: "Ctrl+Alt+F",
     },
   }));
+
+  ipcMain.handle("updates:check", () => checkForUpdates());
+  ipcMain.handle("updates:open", async () => {
+    if (!updates.isReleasePage(lastUpdateUrl)) return false;
+    await shell.openExternal(lastUpdateUrl);
+    return true;
+  });
+}
+
+async function checkForUpdates() {
+  const currentVersion = app.getVersion();
+  try {
+    const response = await fetch(updates.LATEST_API, {
+      headers: {
+        Accept: "application/vnd.github+json",
+        "User-Agent": "PomodoroFloat",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    });
+    if (!response.ok) {
+      let message = "";
+      try {
+        const payload = await response.json();
+        message = typeof payload?.message === "string" ? payload.message : "";
+      } catch {
+        message = "";
+      }
+      lastUpdateUrl = "";
+      return updates.statusResult(
+        updates.classifyHttp(response.status, response.headers.get("x-ratelimit-remaining"), message),
+        currentVersion
+      );
+    }
+    const release = await response.json();
+    const result = updates.resultFromRelease(currentVersion, release);
+    lastUpdateUrl = result.state === "update" ? result.url : "";
+    return result;
+  } catch {
+    lastUpdateUrl = "";
+    return updates.statusResult("offline", currentVersion);
+  }
 }
 
 function delay(ms) {

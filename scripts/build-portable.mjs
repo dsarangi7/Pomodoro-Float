@@ -58,7 +58,7 @@ async function stageApp() {
   await fsp.rm(APP_STAGE, { recursive: true, force: true });
   await fsp.mkdir(APP_STAGE, { recursive: true });
 
-  for (const file of ["main.js", "preload.js", "win-launch.js", "LICENSE"]) {
+  for (const file of ["main.js", "preload.js", "win-launch.js", "update-check.js", "LICENSE"]) {
     await fsp.copyFile(path.join(ROOT, file), path.join(APP_STAGE, file));
   }
   for (const dir of ["renderer", "assets"]) {
@@ -154,6 +154,7 @@ ABOUT
 -----
 Made by Dibya (dsarangi7).
 Feedback: dsarangi7@gmail.com
+Check for updates reads GitHub Releases and opens the download page.
 
 SHORTCUTS
 ---------
@@ -176,7 +177,9 @@ DATA
 ----
 Settings, local stats, and the daily task list are stored in
 %APPDATA%\\Pomodoro Float.
-There is no network access and no account.
+There is no account. Settings and tasks stay on this PC.
+Check for updates is the only network request. It calls the public
+GitHub Releases API.
 `;
   await writeText(path.join(OUTPUT_DIR, "README.txt"), readme);
   const launchCmd = await fsp.readFile(path.join(ROOT, "scripts", "launch-pomodorofloat.cmd"), "utf8");

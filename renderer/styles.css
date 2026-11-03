@@ -1438,6 +1438,22 @@ body[data-running="true"] .compact-pip {
   outline-offset: 2px;
 }
 
+.about-updates {
+  margin-top: 8px;
+}
+
+.about-check {
+  letter-spacing: 0.08em;
+}
+
+.about-status {
+  color: var(--muted);
+}
+
+.about-status-action {
+  margin-top: 2px;
+}
+
 .settings-foot {
   flex: 0 0 auto;
   margin-top: 2px;

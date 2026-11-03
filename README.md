@@ -82,11 +82,11 @@ Pomodoro Float is made by Dibya (dsarangi7).
 
 Feedback: [dsarangi7@gmail.com](mailto:dsarangi7@gmail.com)
 
-Settings → About shows the same name and address.
+Settings → About shows the same name and address. **Check for updates** there reads the public GitHub Releases API and, when a newer version exists, opens that release page in the browser. A quiet check on launch only speaks up if an update is available.
 
 ## Run the portable build
 
-1. Extract `Pomodoro-Float-1.2.2-win64.zip`. The folder inside the zip is
+1. Extract `Pomodoro-Float-1.3.0-win64.zip`. The folder inside the zip is
    `PomodoroFloat` (no spaces).
 2. Keep the whole folder together.
 3. The first time, double-click `Unblock and Launch.cmd`.
@@ -97,8 +97,9 @@ Settings → About shows the same name and address.
 Do not double-click `electron.exe`. That file is the runtime. The launcher is
 `PomodoroFloat.exe`.
 
-The app has no installer and no network access. Settings, stats, and the daily
-task list live in `%APPDATA%\Pomodoro Float`.
+The app has no installer and no account. Settings, stats, and the daily task
+list live in `%APPDATA%\Pomodoro Float`. The only network request is Check for
+updates, which calls the GitHub Releases API.
 
 ## Paths with spaces
 
@@ -194,7 +195,7 @@ Signing would be a separate step if you want SmartScreen to stop warning.
 
 ## Release build
 
-Pushing a version tag such as `v1.2.2` runs
+Pushing a version tag such as `v1.3.0` runs
 [`.github/workflows/windows-portable.yml`](.github/workflows/windows-portable.yml)
 on `windows-latest`. The workflow runs `npm test` and `npm run build`, uploads
 `dist/Pomodoro-Float-<version>-win64.zip` as an Actions artifact, and attaches
