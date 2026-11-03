@@ -69,6 +69,12 @@ async function createApp(options = {}) {
     notify: (payload) => calls.push(["notify", payload]),
     updateTimer: (state) => calls.push(["timer", state]),
     getInfo: async () => ({ version: "1.2.1-test" }),
+    checkForUpdates: async () =>
+      options.updates || { state: "current", message: "You're up to date.", notes: "", url: "" },
+    openUpdate: async () => {
+      calls.push(["open-update"]);
+      return options.openUpdate !== false;
+    },
     setTasksOpen: async (value) => {
       calls.push(["tasks", value]);
       return { tasks: value };
@@ -111,6 +117,60 @@ test("settings about names the developer and the feedback address", async () => 
     assert.equal(mail.textContent.trim(), "dsarangi7@gmail.com");
   } finally {
     window.close();
+  }
+});
+
+test("check for updates reports a newer release and opens the download page", async () => {
+  const { window, calls } = await createApp({
+    updates: {
+      state: "update",
+      message: "v1.4.0 is available.",
+      latestVersion: "1.4.0",
+      notes: "Daily tasks stay on the card.",
+      url: "https://github.com/dsarangi7/Pomodoro-Float/releases/tag/v1.4.0",
+    },
+  });
+  try {
+    await wait(40);
+    const status = window.document.getElementById("updateStatus");
+    assert.equal(status.hidden, false);
+    assert.match(status.textContent, /v1\.4\.0 is available/);
+    assert.match(status.textContent, /Daily tasks stay on the card/);
+    assert.equal(window.document.getElementById("updateAction").hidden, false);
+
+    window.document.querySelector('[data-action="open-update"]').click();
+    await wait(20);
+    assert.ok(calls.some(([kind]) => kind === "open-update"));
+  } finally {
+    window.close();
+  }
+});
+
+test("check for updates says when this version is current and when GitHub cannot be reached", async () => {
+  const current = await createApp();
+  try {
+    const status = current.window.document.getElementById("updateStatus");
+    assert.equal(status.hidden, true);
+    current.window.document.querySelector('[data-action="check-updates"]').click();
+    await wait(30);
+    assert.equal(status.hidden, false);
+    assert.match(status.textContent, /up to date/);
+    assert.equal(current.window.document.getElementById("updateAction").hidden, true);
+  } finally {
+    current.window.close();
+  }
+
+  const offline = await createApp({
+    updates: { state: "offline", message: "Couldn't reach GitHub. Try again.", notes: "", url: "" },
+  });
+  try {
+    offline.window.document.querySelector('[data-action="check-updates"]').click();
+    await wait(30);
+    const status = offline.window.document.getElementById("updateStatus");
+    assert.match(status.textContent, /Couldn't reach GitHub/);
+    assert.equal(offline.window.document.getElementById("updateAction").hidden, true);
+  } finally {
+    offline.window.close();
   }
 });
 

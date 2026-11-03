@@ -19,6 +19,8 @@ contextBridge.exposeInMainWorld("pomodoro", {
   notify: (payload) => ipcRenderer.send("notify", payload),
   updateTimer: (state) => ipcRenderer.send("timer:state", state),
   getInfo: () => ipcRenderer.invoke("app:info"),
+  checkForUpdates: () => ipcRenderer.invoke("updates:check"),
+  openUpdate: () => ipcRenderer.invoke("updates:open"),
   onCommand: (callback) => subscribe("timer:command", callback),
   onWindowState: (callback) => subscribe("window:state", callback),
   onOpenSettings: (callback) => subscribe("app:open-settings", callback),
