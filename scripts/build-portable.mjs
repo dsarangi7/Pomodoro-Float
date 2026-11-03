@@ -150,6 +150,11 @@ sits on the card, under the timer. History on that row opens a month view
 of earlier days. Copy on a selected day puts that date and its tasks on
 the clipboard. Task lists are kept for 120 days.
 
+ABOUT
+-----
+Made by Dibya (dsarangi7).
+Feedback: dsarangi7@gmail.com
+
 SHORTCUTS
 ---------
 Space            Start / pause

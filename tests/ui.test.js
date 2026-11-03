@@ -99,6 +99,21 @@ async function createApp(options = {}) {
   return { dom, window, calls };
 }
 
+test("settings about names the developer and the feedback address", async () => {
+  const { window } = await createApp();
+  try {
+    const about = window.document.querySelector(".about-note");
+    assert.ok(about);
+    assert.match(about.textContent, /Dibya/);
+    assert.match(about.textContent, /dsarangi7/);
+    const mail = about.querySelector('a[href="mailto:dsarangi7@gmail.com"]');
+    assert.ok(mail);
+    assert.equal(mail.textContent.trim(), "dsarangi7@gmail.com");
+  } finally {
+    window.close();
+  }
+});
+
 test("window renders the focus timer and starts/pauses from the big button", async () => {
   const { dom, window } = await createApp();
   try {
