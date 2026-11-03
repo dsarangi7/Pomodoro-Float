@@ -23,7 +23,7 @@
     hide: () => {},
     notify: () => {},
     updateTimer: () => {},
-    getInfo: async () => ({ version: "1.2.1" }),
+    getInfo: async () => ({ version: "1.2.2" }),
     setTasksOpen: async (value) => Boolean(value),
     setHistoryOpen: async (value) => Boolean(value),
     copyText: async () => true,

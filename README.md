@@ -76,9 +76,17 @@ A user name with a space makes `%LOCALAPPDATA%\PomodoroFloat` a spaced path. `Po
 Closing the window hides it to the tray so the timer keeps running. Right-click
 the tomato tray icon to start, pause, reset, skip a phase, or quit.
 
+## About / Feedback
+
+Pomodoro Float is made by Dibya (dsarangi7).
+
+Feedback: [dsarangi7@gmail.com](mailto:dsarangi7@gmail.com)
+
+Settings → About shows the same name and address.
+
 ## Run the portable build
 
-1. Extract `Pomodoro-Float-1.2.1-win64.zip`. The folder inside the zip is
+1. Extract `Pomodoro-Float-1.2.2-win64.zip`. The folder inside the zip is
    `PomodoroFloat` (no spaces).
 2. Keep the whole folder together.
 3. The first time, double-click `Unblock and Launch.cmd`.
@@ -186,7 +194,7 @@ Signing would be a separate step if you want SmartScreen to stop warning.
 
 ## Release build
 
-Pushing a version tag such as `v1.2.1` runs
+Pushing a version tag such as `v1.2.2` runs
 [`.github/workflows/windows-portable.yml`](.github/workflows/windows-portable.yml)
 on `windows-latest`. The workflow runs `npm test` and `npm run build`, uploads
 `dist/Pomodoro-Float-<version>-win64.zip` as an Actions artifact, and attaches

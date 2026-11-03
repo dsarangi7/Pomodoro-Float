@@ -17,8 +17,8 @@ function versionString(args, name) {
 test("the portable exe stamp carries product, company, description, and file version", async () => {
   const { versionQuad, executableStampArgs } = await import("../scripts/win-meta.mjs");
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
-  assert.equal(pkg.version, "1.2.1");
-  assert.equal(versionQuad(pkg.version), "1.2.1.0");
+  assert.equal(pkg.version, "1.2.2");
+  assert.equal(versionQuad(pkg.version), "1.2.2.0");
   assert.equal(versionQuad("1.2"), "1.2.0.0");
 
   const runtimeArgs = executableStampArgs({
@@ -27,12 +27,12 @@ test("the portable exe stamp carries product, company, description, and file ver
     pkg,
   });
   const fileVersionFlag = runtimeArgs.indexOf("--set-file-version");
-  assert.equal(runtimeArgs[fileVersionFlag + 1], "1.2.1.0");
+  assert.equal(runtimeArgs[fileVersionFlag + 1], "1.2.2.0");
   assert.equal(versionString(runtimeArgs, "ProductName"), "Pomodoro Float");
   assert.equal(versionString(runtimeArgs, "CompanyName"), "Pomodoro Float");
   assert.equal(versionString(runtimeArgs, "FileDescription"), pkg.description);
-  assert.equal(versionString(runtimeArgs, "FileVersion"), "1.2.1.0");
-  assert.equal(versionString(runtimeArgs, "ProductVersion"), "1.2.1.0");
+  assert.equal(versionString(runtimeArgs, "FileVersion"), "1.2.2.0");
+  assert.equal(versionString(runtimeArgs, "ProductVersion"), "1.2.2.0");
   assert.equal(versionString(runtimeArgs, "OriginalFilename"), "electron.exe");
 
   const launcherArgs = executableStampArgs({

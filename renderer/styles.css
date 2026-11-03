@@ -1406,6 +1406,38 @@ body[data-running="true"] .compact-pip {
   gap: 4px;
 }
 
+.about-note {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--panel-line);
+}
+
+.about-note p {
+  margin: 4px 0 0;
+  color: var(--cream-soft);
+  font-size: 10.5px;
+  font-weight: 450;
+  letter-spacing: 0.005em;
+  line-height: 1.35;
+  user-select: text;
+}
+
+.about-note a {
+  color: var(--cream);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.about-note a:hover {
+  color: var(--accent);
+}
+
+.about-note a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .settings-foot {
   flex: 0 0 auto;
   margin-top: 2px;

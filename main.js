@@ -1,6 +1,6 @@
 "use strict";
 
-const { app, BrowserWindow, Menu, Notification, Tray, clipboard, globalShortcut, ipcMain, nativeImage, screen } = require("electron");
+const { app, BrowserWindow, Menu, Notification, Tray, clipboard, globalShortcut, ipcMain, nativeImage, screen, shell } = require("electron");
 const fs = require("node:fs");
 const path = require("node:path");
 const winLaunch = require("./win-launch");
@@ -14,6 +14,21 @@ if (process.env[winLaunch.SPACE_MAP_ENV]) {
 }
 
 const APP_ID = "com.pomodorofloat.app";
+const FEEDBACK_MAIL = "dsarangi7@gmail.com";
+
+function feedbackMailUrl(url) {
+  if (typeof url !== "string" || !url.toLowerCase().startsWith("mailto:")) return "";
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return "";
+  }
+  const address = decodeURIComponent(parsed.pathname).replace(/^\/+/, "").toLowerCase();
+  if (address !== FEEDBACK_MAIL) return "";
+  return `mailto:${FEEDBACK_MAIL}`;
+}
+
 const IS_SCREENSHOT = process.argv.includes("--screenshot");
 // Stage padding is 12px. Widget CSS heights: 304 full, 432 with the task list, 508 history, 60 compact.
 const FULL_SIZE = { width: 404, height: 328 };
@@ -345,8 +360,16 @@ function createWindow() {
     mainWindow = null;
   });
 
-  mainWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
-  mainWindow.webContents.on("will-navigate", (event) => event.preventDefault());
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    const mail = feedbackMailUrl(url);
+    if (mail) shell.openExternal(mail).catch(() => {});
+    return { action: "deny" };
+  });
+  mainWindow.webContents.on("will-navigate", (event, url) => {
+    event.preventDefault();
+    const mail = feedbackMailUrl(url);
+    if (mail) shell.openExternal(mail).catch(() => {});
+  });
   mainWindow.webContents.on("render-process-gone", (_event, details) => {
     console.error("Renderer process ended:", details.reason);
   });
